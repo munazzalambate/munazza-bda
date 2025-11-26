@@ -47,18 +47,19 @@ print("\nSQL used to create the table:\n", cursor.fetchone()[0])
 conn.close()
 
 PRACTICAL05
-import pandas as pd
-import re
-df = pd.read_excel(&quot;childmarriage.xlsx&quot;)
+Code: import pandas as pd 
+import re 
+df = pd.read_excel("RowData.xlsx")
 df = df.drop_duplicates().dropna()
 def clean(text):
-if isinstance(text, str):
-text = re.sub(r&#39;\s+&#39;, &#39;&#39;, text) 
-text = re.sub(r&#39;[^\w\s.,-]&#39;, &#39;&#39;, text)
-return text.strip()
+if isinstance(text,str):
+text = re.sub(r'\s+','',text) 
+text = re.sub(r'[^\w\s.,-]','',text) 
+text.strip()  
 return text
-df = df.applymap(clean)
-df.to_excel(&quot;cleaned.xlsx&quot;, index=False)
+df = df.map(clean)
+df.to_excel("clean.xlsx",index=False)
+print(df)
 
 PRACTICAL06
 !pip install pandas matplotlib --quiet
@@ -115,57 +116,51 @@ plt.tight_layout()
 plt.show()
 
 For Multiplebars
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-# Load the data
-df = pd.read_excel(&quot;corruption_vs_child_labour_20rows.xlsx&quot;)
-# Set position of bars on X axis
-x = np.arange(len(df[&quot;Country&quot;]))
+import pandas as pd import 
+matplotlib.pyplot as plt import 
+numpy as np
+df = pd.read_excel("corruption_vs_child_labour.xlsx")
+x = np.arange(len(df["Country"]))
 width = 0.4
-# Plotting
-plt.figure(figsize=(12, 6))
-plt.bar(x - width/2, df[&quot;Perceived Corruption Score (0-100)&quot;], width,
-label=&#39;Corruption Score&#39;)
-plt.bar(x + width/2, df[&quot;Child Labour (%)&quot;], width, label=&#39;Child Labour
-%&#39;)
-# Labeling
-plt.xlabel(&quot;Country&quot;)
-plt.ylabel(&quot;Score / Percentage&quot;)
-plt.title(&quot;Perceived Corruption vs Child Labour by Country&quot;)
-plt.xticks(ticks=x, labels=df[&quot;Country&quot;], rotation=45, ha=&#39;right&#39;)
-plt.legend()
-plt.tight_layout()
-plt.grid(axis=&#39;y&#39;)
-# Show plot
+plt.figure(figsize=(12,6))
+plt.bar(x - width/2, df["Perceived Corruption Score (0-100)"], width, label='Corruption Score')
+plt.bar(x + width/2, df["Child Labour(%)"], width, label='Child Labour %')
+# Labeling plt.xlabel("Country") 
+plt.ylabel("Score / Percentage")
+plt.title("Perceived Corruption vs Child Labour by Country") 
+plt.xticks(ticks=x, labels=df["Country"], rotation=45, ha='right') 
+plt.legend() plt.tight_layout()
+plt.grid(axis='y')
 plt.show()
 
 
 PRACTICAL08
-import pandas as pd
-import plotly.express as px
-df = pd.read_csv(&quot;child_labour.csv&quot;)
-fig = px.choropleth(
+import pandas as pd import 
+plotly.express as px
+# Load CSV data df = 
+pd.read_csv("Child_labour.csv")
+# Create choropleth world map fig 
+= px.choropleth(
 df,
-locations=&quot;Code&quot;, 
-color=&quot;Child Labour %&quot;, 
-hover_name=&quot;Country&quot;,
-color_continuous_scale=&quot;Reds&quot;, 
-title=&quot;Child Labour Worldwide (%)&quot;
+locations="Code", # ISO Alpha-3 country codes 
+color="Child Labour %", # values to show 
+hover_name="Country", # hover info 
+color_continuous_scale="Reds", # color scheme title="Child Labour 
+Worldwide (%)"
 )
-fig.write_html(&quot;child_labour_map.html&quot;)
-print(&quot;Map saved as child_labour_map.html&quot;)
+# Save as HTML file
+fig.write_html("child_labour_map.html") print("Map 
+saved as child_labour_map.html")
+Output:
 
 8B
-import requests
-def get_summary(title):
-url = f&quot;https://en.wikipedia.org/api/rest_v1/page/summary/{title}&quot;
-headers = {&quot;User-Agent&quot;: &quot;MyBot/1.0 (https://example.com/contact)&quot;}
-r = requests.get(url, headers=headers)
-if r.ok:
-data = r.json()
-print(f&quot;{data[&#39;title&#39;]}:\n{data[&#39;extract&#39;]}\n&quot;)
-else:
-print(f&quot;Error {r.status_code}: Could not fetch summary.&quot;)
-get_summary(&quot;OpenAI&quot;)
-get_summary(&quot;Python_(programming_language)&quot;)
+import requests 
+def get_summary(title): 
+ url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{title}" 
+headers = {"User-Agent": "MyBot/1.0 (https://example.com/contact)"} 
+r = requests.get(url, headers=headers) if r.ok: 
+ data = r.json() 
+print(f"{data['title']}:\n{data['extract']}\n") else: 
+ print(f"Error {r.status_code}: Could not fetch summary.") 
+# Example calls get_summary("OpenAI") 
+get_summary("Python_(programming_language)")
