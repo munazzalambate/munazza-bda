@@ -1,0 +1,257 @@
+PRACTICAL01
+def McCulloch_Pitts(inputs, weights, threshold):
+    summation = 0
+    for i in range(len(inputs)):
+        summation += inputs[i] * weights[i]
+    if summation >= threshold:
+        return 1
+    else:
+        return 0   
+def AND_gate(x1, x2):
+    weights = [1, 1]     
+    threshold = 2        
+    return McCulloch_Pitts([x1, x2], weights, threshold)
+def OR_gate(x1, x2):
+    weights = [1, 1]
+    threshold = 1       
+    return McCulloch_Pitts([x1, x2], weights, threshold)
+print("AND Gate:")
+for a in [0, 1]:
+    for b in [0, 1]:
+        print(f"{a} AND {b} = {AND_gate(a, b)}")
+print("\nOR Gate:")
+for a in [0, 1]:
+    for b in [0, 1]:
+        print(f"{a} OR {b} = {OR_gate(a, b)}")
+
+PRACTICAL02
+import numpy as np
+def hebbian_train(X, Y):
+    w = np.zeros(X.shape[1])
+    b = 0
+    for i in range(len(X)):
+        w = w + X[i] * Y[i]   # Hebb’s rule
+        b = b + Y[i]
+    return w, b
+def activation(net):
+    return 1 if net >= 2 else -1 #2 and 0
+def test_gate(X, w, b):
+    outputs = []
+    for x in X:
+        x1, x2 = x
+        net = (x1 * w[0]) + (x2 * w[1]) + b
+        print(f"Input: {x}, Net = ({x1}*{w[0]} + {x2}*{w[1]} + {b}) = {net}")
+        output = activation(net)
+        print(f"Output: {output}\n")
+        outputs.append(output)
+    return outputs
+def main():
+    print("Choose Logic Gate to Simulate using Hebbian Network (Bipolar):")
+    print("1. AND")
+    print("2. OR")
+    choice = int(input("Enter your choice (1/2): "))
+    if choice == 1:
+        X = np.array([[-1,-1],[-1,1],[1,-1],[1,1]])
+        Y = np.array([-1,-1,-1,1])
+        w, b = hebbian_train(X, Y)
+        print("\n--- AND Gate Simulation (Bipolar) ---")
+        outputs = test_gate(X, w, b)
+        print("Final Outputs:", outputs)
+    elif choice == 2:
+        X = np.array([[-1,-1],[-1,1],[1,-1],[1,1]])
+        Y = np.array([-1,1,1,1])
+        w, b = hebbian_train(X, Y)
+        print("\n--- OR Gate Simulation (Bipolar) ---")
+        outputs = test_gate(X, w, b)
+        print("Final Outputs:", outputs)
+    else:
+        print("Invalid choice! Please run again.")
+if __name__ == "__main__":
+    main()
+
+PRACTICAL03
+import numpy as np
+def perceptron_train(X, T, learning_rate=1, epochs=10):
+    n_samples, n_features = X.shape
+    W = np.zeros(n_features)
+    b = 0
+    for epoch in range(epochs):
+        for i in range(n_samples):
+            net = 0
+            for j in range(n_features):
+                net += W[j] * X[i][j]
+            net = net + b
+
+            y = 1 if net >= 0 else -1
+            error = T[i] - y
+            W = W + learning_rate * error * X[i]
+            b = b + learning_rate * error
+    return W, b
+def perceptron_predict(X, W, b):
+    outputs = []
+    nets = []
+    for i in range(X.shape[0]):
+        net = 0
+        for j in range(len(W)):
+            net += W[j] * X[i][j]
+        net = net + b
+
+        y = 1 if net >= 0 else -1
+        outputs.append(y)
+        nets.append(net)
+    return outputs, nets
+def and_gate():
+    X = np.array([[-1,-1], [-1,1], [1,-1], [1,1]])
+    T = np.array([-1, -1, -1, 1])   # AND in bipolar
+    return X, T, "AND Gate (Bipolar Inputs & Targets)"
+
+def or_gate():
+    X = np.array([[0,0], [0,1], [1,0], [1,1]])
+    T = np.array([-1, 1, 1, 1])     # OR with binary input, bipolar target
+    return X, T, "OR Gate (Binary Inputs & Bipolar Targets)"
+
+def andnot_gate():
+    X = np.array([[-1,-1], [-1,1], [1,-1], [1,1]])
+    T = np.array([-1, -1, 1, -1])   # AND-NOT: x1 AND (NOT x2) in bipolar
+    return X, T, "AND-NOT Gate (Bipolar Inputs & Targets)"
+switch = {
+    1: and_gate,
+    2: or_gate,
+    3: andnot_gate
+}
+choice = int(input("Choose Gate: 1.AND  2.OR  3.AND-NOT : "))
+
+if choice in switch:
+    X, T, title = switch[choice]()
+    W, b = perceptron_train(X, T)
+    
+    print(f"\n{title}")
+    print("Inputs\t\tTarget\tNet\t\tOutput")
+    for i in range(len(X)):
+        y, net = perceptron_predict(np.array([X[i]]), W, b)
+        print(f"{X[i]}\t\t{T[i]}\t{net[0]:.2f}\t\t{y[0]}")
+else:
+    print("Invalid choice!")
+
+PRACTICAL04
+A = {"a": 0.2, "b": 0.3, "c": 0.6, "d": 0.6}
+B = {"a": 0.9, "b": 0.9, "c": 0.4, "d": 0.5}
+def fuzzy_union():
+    Y = dict()
+    for key in A:
+        Y[key] = max(A[key], B[key])
+    print('Fuzzy Set Union:', Y)
+def fuzzy_intersection():
+    Y = dict()
+    for key in A:
+        Y[key] = min(A[key], B[key])
+    print('Fuzzy Set Intersection:', Y)
+def fuzzy_complement():
+    Y = dict()
+    for key in A:
+        Y[key] = 1 - A[key]
+    print('Fuzzy Set Complement of A:', Y)
+def fuzzy_difference():
+    Y = dict()
+    for key in A:
+        Y[key] = min(A[key], 1 - B[key])
+    print('Fuzzy Set Difference (A - B):', Y)
+switch = {
+    1: fuzzy_union,
+    2: fuzzy_intersection,
+    3: fuzzy_complement,
+    4: fuzzy_difference
+}
+print("Fuzzy Sets Operations Menu:")
+print("1. Union")
+print("2. Intersection")
+print("3. Complement")
+print("4. Difference")
+choice = int(input("Enter your choice (1-4): "))
+print("\nFirst Fuzzy Set A:", A)
+print("Second Fuzzy Set B:", B)
+
+if choice in switch:
+    switch[choice]()  
+else:
+    print("Invalid choice!")
+
+PRACTICAL05
+def algebraic_sum(a, b):
+    return round(a + b - a * b, 3)
+
+def algebraic_product(a, b):
+    return round(a * b, 3)
+
+def bounded_sum(a, b):
+    return round(min(1, a + b), 3)
+
+def bounded_difference(a, b):
+    return round(max(0, a + b - 1), 3)
+A = {"a": 0.2, "b": 0.3, "c": 0.4, "d": 0.5}
+B = {"a": 0.1, "b": 0.2, "c": 0.2, "d": 0.1}  
+def merge_sets(A, B, operation):
+    result = {}
+    for key in A:
+        if key in B:
+            result[key] = operation(A[key], B[key])
+    return result
+print("Choose operation:")
+print("1: Algebraic Sum")
+print("2: Algebraic Product")
+print("3: Bounded Sum")
+print("4: Bounded Difference")
+choice = int(input("Enter your choice (1-4): "))
+switcher = {
+    1: algebraic_sum,
+    2: algebraic_product,
+    3: bounded_sum,
+    4: bounded_difference
+}
+operation = switcher.get(choice)
+if operation:
+    merged_result = merge_sets(A, B, operation)
+    print("Result:", merged_result)
+else:
+    print("Invalid choice!")
+
+PRACTICAL7
+import numpy as np
+S = np.array([
+    [1, 0, 1, 0],
+    [1, 0, 0, 1],
+    [1, 1, 0, 0],
+    [0, 0, 1, 1]
+])
+T = np.array([
+    [1, 0],
+    [1, 0],
+    [0, 1],
+    [0, 1]
+])
+W = np.zeros((T.shape[1], S.shape[1]))  
+for i in range(len(S)):
+    W += np.outer(T[i], S[i])
+print("Weight Matrix W:")
+print(W)
+
+PRACTICAL08
+import numpy as np
+x = np.array([-1, 1, 1, 1])
+W = np.outer(x, x)
+print("Weight Matrix W:")
+print(W, "\n")
+test_vectors = [
+    np.array([-1, 1, 1, 1]),    # original
+    np.array([0, 1, 1, 1]),     # one missing
+    np.array([-1, -1, 1, 1]),   # one mistake
+    np.array([0, 0, 1, 1]),     # two missing
+    np.array([-1, -1, 1, -1])   # two mistakes
+]
+def autoassoc_output(W, x):
+    y = W @ x
+    y = np.where(y >= 0, 1, -1)
+    return y    
+for i, test_vec in enumerate(test_vectors):
+    output = autoassoc_output(W, test_vec)
+    print("Input:", test_vec, " Output:", output)
